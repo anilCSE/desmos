@@ -69,9 +69,6 @@ import (
 	profilestypes "github.com/desmos-labs/desmos/x/profiles/types"
 	relationshipskeeper "github.com/desmos-labs/desmos/x/relationships/keeper"
 	relationshipstypes "github.com/desmos-labs/desmos/x/relationships/types"
-	"github.com/desmos-labs/desmos/x/reports"
-	reportsKeeper "github.com/desmos-labs/desmos/x/reports/keeper"
-	reportsTypes "github.com/desmos-labs/desmos/x/reports/types"
 
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
@@ -134,7 +131,6 @@ var (
 		magpie.AppModuleBasic{},
 		posts.AppModuleBasic{},
 		profiles.AppModuleBasic{},
-		reports.AppModuleBasic{},
 		relationships.AppModuleBasic{},
 	)
 
@@ -187,7 +183,6 @@ type DesmosApp struct {
 	magpieKeeper        magpieKeeper.Keeper
 	postsKeeper         postskeeper.Keeper
 	ProfileKeeper       profileskeeper.Keeper
-	ReportsKeeper       reportsKeeper.Keeper
 	RelationshipsKeeper relationshipskeeper.Keeper
 
 	// Module Manager
@@ -231,7 +226,7 @@ func NewDesmosApp(
 		evidencetypes.StoreKey,
 
 		// Custom modules
-		magpieTypes.StoreKey, poststypes.StoreKey, profilestypes.StoreKey, reportsTypes.StoreKey,
+		magpieTypes.StoreKey, poststypes.StoreKey, profilestypes.StoreKey,
 		relationshipstypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -322,11 +317,6 @@ func NewDesmosApp(
 		app.GetSubspace(profilestypes.ModuleName),
 		app.RelationshipsKeeper,
 	)
-	app.ReportsKeeper = reportsKeeper.NewKeeper(
-		app.appCodec,
-		keys[reportsTypes.StoreKey],
-		app.postsKeeper,
-	)
 
 	/****  Module Options ****/
 
@@ -359,7 +349,6 @@ func NewDesmosApp(
 		magpie.NewAppModule(app.appCodec, app.magpieKeeper, app.AccountKeeper, app.BankKeeper),
 		posts.NewAppModule(app.appCodec, app.postsKeeper, app.AccountKeeper, app.BankKeeper),
 		profiles.NewAppModule(app.appCodec, app.ProfileKeeper, app.AccountKeeper, app.BankKeeper),
-		reports.NewAppModule(app.appCodec, app.ReportsKeeper, app.postsKeeper, app.AccountKeeper, app.BankKeeper),
 		relationships.NewAppModule(app.appCodec, app.RelationshipsKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 
@@ -379,7 +368,7 @@ func NewDesmosApp(
 		govtypes.ModuleName, evidencetypes.ModuleName,
 
 		feestypes.ModuleName, magpieTypes.ModuleName, poststypes.ModuleName, profilestypes.ModuleName,
-		reportsTypes.ModuleName, relationshipstypes.ModuleName, // custom modules
+		relationshipstypes.ModuleName, // custom modules
 
 		crisistypes.ModuleName,  // runs the invariants at genesis - should run after other modules
 		genutiltypes.ModuleName, // genutils must occur after staking so that pools are properly initialized with tokens from genesis accounts.
@@ -411,7 +400,6 @@ func NewDesmosApp(
 		magpie.NewAppModule(app.appCodec, app.magpieKeeper, app.AccountKeeper, app.BankKeeper),
 		posts.NewAppModule(app.appCodec, app.postsKeeper, app.AccountKeeper, app.BankKeeper),
 		profiles.NewAppModule(app.appCodec, app.ProfileKeeper, app.AccountKeeper, app.BankKeeper),
-		reports.NewAppModule(app.appCodec, app.ReportsKeeper, app.postsKeeper, app.AccountKeeper, app.BankKeeper),
 		relationships.NewAppModule(app.appCodec, app.RelationshipsKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 
